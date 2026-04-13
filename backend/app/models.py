@@ -66,6 +66,8 @@ class Role(SQLModel, table=True):
 
 
 class Category(SQLModel, table=True):
+    __tablename__ = "categories"
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     nombre: str = Field(max_length=100)
     is_active: bool = True
@@ -81,9 +83,11 @@ class Category(SQLModel, table=True):
 
 
 class Section(SQLModel, table=True):
+    __tablename__ = "sections"
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     nombre: str = Field(max_length=100)
-    category_id: uuid.UUID = Field(foreign_key="category.id")
+    category_id: uuid.UUID = Field(foreign_key="categories.id")
     is_active: bool = True
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -98,9 +102,11 @@ class Section(SQLModel, table=True):
 
 
 class SubSection(SQLModel, table=True):
+    __tablename__ = "sub_sections"
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     nombre: str = Field(max_length=150)
-    section_id: uuid.UUID = Field(foreign_key="section.id")
+    section_id: uuid.UUID = Field(foreign_key="sections.id")
     is_active: bool = True
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,

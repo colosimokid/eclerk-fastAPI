@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from pydantic import EmailStr
 from sqlalchemy import DateTime
 from sqlmodel import Field, Relationship, SQLModel
+from typing import Optional
 
 
 def get_datetime_utc() -> datetime:
@@ -16,7 +17,7 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
-
+    id_rol: uuid.UUID | None = Field(default=None, foreign_key="role.id")
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
@@ -49,12 +50,19 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    id_rol: uuid.UUID | None = Field(default=None)
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
     )
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    role: Optional["Role"] = Relationship(back_populates="users")
+
+
+class Role(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(max_length=30)
+    is_active: bool = True
+    users: list["User"] = Relationship(back_populates="role")
 
 
 # Properties to return via API, id is always required

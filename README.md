@@ -218,6 +218,37 @@ Frontend docs: [frontend/README.md](./frontend/README.md).
 
 Deployment docs: [deployment.md](./deployment.md).
 
+## Development Log and Policies
+
+This section is used to capture the current work and the conventions we are following in this project.
+
+### Current work in progress
+
+- Frontend: updated the sidebar menu in `frontend/src/components/Sidebar/AppSidebar.tsx` and `frontend/src/components/Sidebar/Main.tsx`.
+  - `Dashboard` remains the only top-level base item.
+  - `General`, `Compras`, and `Ventas` were added with collapsible submenu items.
+  - `Admin` remains available for superusers.
+- Backend: schema changes are tracked via Alembic migrations in `backend/app/alembic/versions/`.
+  - Added `User.id_rol` and linked it to `role.id` with a foreign key.
+  - Added the `role` table with `id`, `name`, and `is_active`.
+- Docker/dev workflow: local development is working with `docker compose up --build`.
+
+### Policies and conventions
+
+- Use the root `README.md` to keep a short, high-level project log for future collaborators and AI reviewers.
+- Keep meaningful Git commit messages for every change; use the README log for quick context.
+- Use Alembic for all database schema changes instead of altering the database manually.
+- Prefer rebuilding the Docker container when code changes affect backend or Docker-managed files.
+- Keep frontend route/menu definitions in `frontend/src/components/Sidebar/` and backend schema in `backend/app/`.
+- If a runtime or compile error appears, capture the exact command and output in the log.
+
+### Recommended tracking tools
+
+- `README.md` for quick context and current project state.
+- `CHANGELOG.md` for a more formal historical record of releases and major changes.
+- Git history and branches for detailed change context.
+- Optionally, a dedicated `docs/` folder or `project-notes.md` for longer design decisions.
+
 ## Development
 
 General development docs: [development.md](./development.md).

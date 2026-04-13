@@ -1,4 +1,4 @@
-import { Home, Layers, ShoppingCart, Truck, Users } from "lucide-react"
+import { Home, Layers, ShoppingCart, Truck, Users, GitBranch } from "lucide-react"
 
 import { SidebarAppearance } from "@/components/Common/Appearance"
 import { Logo } from "@/components/Common/Logo"
@@ -24,7 +24,7 @@ const sidebarItems: Item[] = [
       { title: "Marcas", path: "/general/marcas" },
       { title: "Productos", path: "/general/productos" },
       { title: "Depositos", path: "/general/depositos" },
-      { title: "Categorias", path: "/general/categorias" },
+      { icon: GitBranch, title: "Jerarquía", path: "/hierarchy" },
     ],
   },
   {

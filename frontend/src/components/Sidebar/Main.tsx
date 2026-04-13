@@ -18,6 +18,7 @@ import {
 export type SubItem = {
   title: string
   path: string
+  icon?: LucideIcon
 }
 
 export type Item = {

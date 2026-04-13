@@ -234,3 +234,159 @@ export type UtilsTestEmailData = {
 export type UtilsTestEmailResponse = (Message);
 
 export type UtilsHealthCheckResponse = (boolean);
+
+export type CategoryCreate = {
+    nombre: string;
+    is_active?: boolean;
+};
+
+export type CategoryPublic = {
+    id: string;
+    nombre: string;
+    is_active?: boolean;
+    created_at?: (string | null);
+    updated_at?: (string | null);
+};
+
+export type CategoryUpdate = {
+    nombre?: (string | null);
+    is_active?: boolean;
+};
+
+export type SectionCreate = {
+    nombre: string;
+    category_id: string;
+    is_active?: boolean;
+};
+
+export type SectionPublic = {
+    id: string;
+    nombre: string;
+    category_id: string;
+    is_active?: boolean;
+    created_at?: (string | null);
+    updated_at?: (string | null);
+};
+
+export type SectionUpdate = {
+    nombre?: (string | null);
+    category_id?: (string | null);
+    is_active?: boolean;
+};
+
+export type SubSectionCreate = {
+    nombre: string;
+    section_id: string;
+    is_active?: boolean;
+};
+
+export type SubSectionPublic = {
+    id: string;
+    nombre: string;
+    section_id: string;
+    is_active?: boolean;
+    created_at?: (string | null);
+    updated_at?: (string | null);
+};
+
+export type SubSectionUpdate = {
+    nombre?: (string | null);
+    section_id?: (string | null);
+    is_active?: boolean;
+};
+
+export type CategoriesReadCategoriesData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type CategoriesReadCategoriesResponse = (Array<CategoryPublic>);
+
+export type CategoriesCreateCategoryData = {
+    requestBody: CategoryCreate;
+};
+
+export type CategoriesCreateCategoryResponse = (CategoryPublic);
+
+export type CategoriesReadCategoryData = {
+    categoryId: string;
+};
+
+export type CategoriesReadCategoryResponse = (CategoryPublic);
+
+export type CategoriesUpdateCategoryData = {
+    categoryId: string;
+    requestBody: CategoryUpdate;
+};
+
+export type CategoriesUpdateCategoryResponse = (CategoryPublic);
+
+export type CategoriesDeleteCategoryData = {
+    categoryId: string;
+};
+
+export type CategoriesDeleteCategoryResponse = (Message);
+
+export type SectionsReadSectionsData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type SectionsReadSectionsResponse = (Array<SectionPublic>);
+
+export type SectionsCreateSectionData = {
+    requestBody: SectionCreate;
+};
+
+export type SectionsCreateSectionResponse = (SectionPublic);
+
+export type SectionsReadSectionData = {
+    sectionId: string;
+};
+
+export type SectionsReadSectionResponse = (SectionPublic);
+
+export type SectionsUpdateSectionData = {
+    sectionId: string;
+    requestBody: SectionUpdate;
+};
+
+export type SectionsUpdateSectionResponse = (SectionPublic);
+
+export type SectionsDeleteSectionData = {
+    sectionId: string;
+};
+
+export type SectionsDeleteSectionResponse = (Message);
+
+export type SubSectionsReadSubSectionsData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type SubSectionsReadSubSectionsResponse = (Array<SubSectionPublic>);
+
+export type SubSectionsCreateSubSectionData = {
+    requestBody: SubSectionCreate;
+};
+
+export type SubSectionsCreateSubSectionResponse = (SubSectionPublic);
+
+export type SubSectionsReadSubSectionData = {
+    subSectionId: string;
+};
+
+export type SubSectionsReadSubSectionResponse = (SubSectionPublic);
+
+export type SubSectionsUpdateSubSectionData = {
+    subSectionId: string;
+    requestBody: SubSectionUpdate;
+};
+
+export type SubSectionsUpdateSubSectionResponse = (SubSectionPublic);
+
+export type SubSectionsDeleteSubSectionData = {
+    subSectionId: string;
+};
+
+export type SubSectionsDeleteSubSectionResponse = (Message);

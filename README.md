@@ -228,6 +228,7 @@ This section is used to capture the current work and the conventions we are foll
   - `Dashboard` remains the only top-level base item.
   - `General`, `Compras`, and `Ventas` were added with collapsible submenu items.
   - `Admin` remains available for superusers.
+  - Added "Jerarquía" menu item in General section pointing to `/hierarchy` route.
 - Backend: schema changes are tracked via Alembic migrations in `backend/app/alembic/versions/`.
   - Added `User.id_rol` and linked it to `role.id` with a foreign key.
   - Added the `role` table with `id`, `name`, and `is_active`.
@@ -239,6 +240,13 @@ This section is used to capture the current work and the conventions we are foll
   - Added API routes for categories in `backend/app/api/routes/categories.py` with prefix `/categories` and tags `["categories"]`.
   - Added API routes for sections in `backend/app/api/routes/sections.py` with prefix `/sections` and tags `["sections"]`.
   - Added API routes for sub-sections in `backend/app/api/routes/sub_sections.py` with prefix `/sub-sections` and tags `["sub-sections"]`.
+- Frontend components: created hierarchical table component in `frontend/src/components/Hierarchy/`.
+  - `HierarchyManager.tsx`: Main component with table structure and data fetching.
+  - `CategoryRow.tsx`: Expandable category rows with section management.
+  - `SectionRow.tsx`: Expandable section rows with sub-section management.
+  - `SubSectionRow.tsx`: Sub-section display rows.
+  - `AddCategory.tsx`, `AddSection.tsx`, `AddSubSection.tsx`: Form dialogs for creating new items.
+  - Added route `/hierarchy` in `frontend/src/routes/_layout/hierarchy.tsx`.
 - Docker/dev workflow: local development is working with `docker compose up --build`.
 
 ### Policies and conventions
@@ -249,6 +257,18 @@ This section is used to capture the current work and the conventions we are foll
 - Prefer rebuilding the Docker container when code changes affect backend or Docker-managed files.
 - Keep frontend route/menu definitions in `frontend/src/components/Sidebar/` and backend schema in `backend/app/`.
 - If a runtime or compile error appears, capture the exact command and output in the log.
+- When a helper is defined with `this: (msg: string) => void`, invoke it with `.bind(showErrorToast)` before passing it as a callback, as used in `src/components/Hierarchy/AddCategory.tsx`. This is the correct pattern for new components.
+
+### Open issue: duplicate table names and schema mismatch
+- There is a naming mismatch between model/table names and generated Alembic migrations for the hierarchy entities.
+- Current backend schema includes plural tables: `categories`, `sections`, `sub_sections`.
+- At the same time, the app has singular model/table references: `category`, `section`, `subsection`.
+- This likely happened because the first tables were created from the earlier model state/SQLModel defaults, while later migrations were generated with plural table names.
+  - `Category` class currently maps to a singular table name by SQLModel default, but the migration created `categories`.
+  - `Section` model references `foreign_key="category.id"` instead of `categories.id`, so it is inconsistent with the current `sections`/`categories` schema.
+  - `SubSection` model references `foreign_key="section.id"` instead of `sections.id`, causing the same mismatch for sub-sections.
+- Result: one set of tables is used by the app models and another by the Alembic migrations, which can create duplicate or orphaned tables.
+- Fix path: normalize names consistently, use explicit table names or correct foreign key references, then regenerate/correct Alembic migrations before applying.
 
 ### Recommended tracking tools
 

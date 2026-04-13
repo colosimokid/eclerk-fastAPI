@@ -235,6 +235,10 @@ This section is used to capture the current work and the conventions we are foll
   - Added `sections` table (UUID id, nombre VARCHAR(100), category_id FK, is_active BOOLEAN, timestamps).
   - Added `sub_sections` table (UUID id, nombre VARCHAR(150), section_id FK, is_active BOOLEAN, timestamps).
   - Added SQLModel classes for `Category`, `Section`, and `SubSection` in `backend/app/models.py`.
+  - Added CRUD functions for categories, sections, and sub_sections in `backend/app/crud.py`.
+  - Added API routes for categories in `backend/app/api/routes/categories.py` with prefix `/categories` and tags `["categories"]`.
+  - Added API routes for sections in `backend/app/api/routes/sections.py` with prefix `/sections` and tags `["sections"]`.
+  - Added API routes for sub-sections in `backend/app/api/routes/sub_sections.py` with prefix `/sub-sections` and tags `["sub-sections"]`.
 - Docker/dev workflow: local development is working with `docker compose up --build`.
 
 ### Policies and conventions

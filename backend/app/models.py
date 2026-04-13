@@ -65,6 +65,54 @@ class Role(SQLModel, table=True):
     users: list["User"] = Relationship(back_populates="role")
 
 
+class Category(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    nombre: str = Field(max_length=100)
+    is_active: bool = True
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    sections: list["Section"] = Relationship(back_populates="category")
+
+
+class Section(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    nombre: str = Field(max_length=100)
+    category_id: uuid.UUID = Field(foreign_key="category.id")
+    is_active: bool = True
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    category: Optional["Category"] = Relationship(back_populates="sections")
+    sub_sections: list["SubSection"] = Relationship(back_populates="section")
+
+
+class SubSection(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    nombre: str = Field(max_length=150)
+    section_id: uuid.UUID = Field(foreign_key="section.id")
+    is_active: bool = True
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    section: Optional["Section"] = Relationship(back_populates="sub_sections")
+
+
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
@@ -114,6 +162,88 @@ class ItemPublic(ItemBase):
 
 class ItemsPublic(SQLModel):
     data: list[ItemPublic]
+    count: int
+
+
+# Category models
+class CategoryBase(SQLModel):
+    nombre: str = Field(max_length=100)
+    is_active: bool = True
+
+
+class CategoryCreate(CategoryBase):
+    pass
+
+
+class CategoryUpdate(CategoryBase):
+    nombre: str | None = Field(default=None, max_length=100)
+    is_active: bool | None = Field(default=None)
+
+
+class CategoryPublic(CategoryBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class CategoriesPublic(SQLModel):
+    data: list[CategoryPublic]
+    count: int
+
+
+# Section models
+class SectionBase(SQLModel):
+    nombre: str = Field(max_length=100)
+    category_id: uuid.UUID
+    is_active: bool = True
+
+
+class SectionCreate(SectionBase):
+    pass
+
+
+class SectionUpdate(SectionBase):
+    nombre: str | None = Field(default=None, max_length=100)
+    category_id: uuid.UUID | None = Field(default=None)
+    is_active: bool | None = Field(default=None)
+
+
+class SectionPublic(SectionBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class SectionsPublic(SQLModel):
+    data: list[SectionPublic]
+    count: int
+
+
+# SubSection models
+class SubSectionBase(SQLModel):
+    nombre: str = Field(max_length=150)
+    section_id: uuid.UUID
+    is_active: bool = True
+
+
+class SubSectionCreate(SubSectionBase):
+    pass
+
+
+class SubSectionUpdate(SubSectionBase):
+    nombre: str | None = Field(default=None, max_length=150)
+    section_id: uuid.UUID | None = Field(default=None)
+    is_active: bool | None = Field(default=None)
+
+
+class SubSectionPublic(SubSectionBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class SubSectionsPublic(SQLModel):
+    data: list[SubSectionPublic]
     count: int
 
 

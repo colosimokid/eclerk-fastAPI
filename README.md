@@ -231,6 +231,10 @@ This section is used to capture the current work and the conventions we are foll
 - Backend: schema changes are tracked via Alembic migrations in `backend/app/alembic/versions/`.
   - Added `User.id_rol` and linked it to `role.id` with a foreign key.
   - Added the `role` table with `id`, `name`, and `is_active`.
+  - Added `categories` table (UUID id, nombre VARCHAR(100), is_active BOOLEAN, timestamps).
+  - Added `sections` table (UUID id, nombre VARCHAR(100), category_id FK, is_active BOOLEAN, timestamps).
+  - Added `sub_sections` table (UUID id, nombre VARCHAR(150), section_id FK, is_active BOOLEAN, timestamps).
+  - Added SQLModel classes for `Category`, `Section`, and `SubSection` in `backend/app/models.py`.
 - Docker/dev workflow: local development is working with `docker compose up --build`.
 
 ### Policies and conventions

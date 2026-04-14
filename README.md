@@ -226,6 +226,10 @@ This section is used to capture the current work and the conventions we are foll
 
 - Frontend: updated the sidebar menu in `frontend/src/components/Sidebar/AppSidebar.tsx` and `frontend/src/components/Sidebar/Main.tsx`.
   - `Dashboard` remains the only top-level base item.
+- Preservation policy: do not change existing menu routes such as `/general/marcas` unless explicitly requested.
+- Code deletion policy: do not remove or refactor application code without prior authorization.
+- New frontend modules should be added under the existing menu structure rather than changing current menu paths.
+
   - `General`, `Compras`, and `Ventas` were added with collapsible submenu items.
   - `Admin` remains available for superusers.
   - Added "Jerarquía" menu item in General section pointing to `/hierarchy` route.
@@ -256,6 +260,8 @@ This section is used to capture the current work and the conventions we are foll
 - Use Alembic for all database schema changes instead of altering the database manually.
 - Prefer rebuilding the Docker container when code changes affect backend or Docker-managed files.
 - Keep frontend route/menu definitions in `frontend/src/components/Sidebar/` and backend schema in `backend/app/`.
+- Do not delete code without explicit authorization.
+- Preserve existing sidebar routes such as `general/marcas` and other menu items unless a direct request is made to modify them.
 - If a runtime or compile error appears, capture the exact command and output in the log.
 - When a helper is defined with `this: (msg: string) => void`, invoke it with `.bind(showErrorToast)` before passing it as a callback, as used in `src/components/Hierarchy/AddCategory.tsx`. This is the correct pattern for new components.
 

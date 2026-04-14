@@ -119,6 +119,22 @@ class SubSection(SQLModel, table=True):
     section: Optional["Section"] = Relationship(back_populates="sub_sections")
 
 
+class Brand(SQLModel, table=True):
+    __tablename__ = "brands"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    nombre: str = Field(max_length=100)
+    is_active: bool = True
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+
+
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
@@ -250,6 +266,32 @@ class SubSectionPublic(SubSectionBase):
 
 class SubSectionsPublic(SQLModel):
     data: list[SubSectionPublic]
+    count: int
+
+
+# Brand models
+class BrandBase(SQLModel):
+    nombre: str = Field(max_length=100)
+    is_active: bool = True
+
+
+class BrandCreate(BrandBase):
+    pass
+
+
+class BrandUpdate(BrandBase):
+    nombre: str | None = Field(default=None, max_length=100)
+    is_active: bool | None = Field(default=None)
+
+
+class BrandPublic(BrandBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class BrandsPublic(SQLModel):
+    data: list[BrandPublic]
     count: int
 
 

@@ -295,6 +295,101 @@ class BrandsPublic(SQLModel):
     count: int
 
 
+# Warehouse models
+class WarehouseBase(SQLModel):
+    nombre: str = Field(max_length=100)
+    estado: str = Field(max_length=50)
+    direccion: str = Field(max_length=255)
+    is_active: bool = True
+
+
+class WarehouseCreate(WarehouseBase):
+    pass
+
+
+class WarehouseUpdate(WarehouseBase):
+    nombre: str | None = Field(default=None, max_length=100)
+    estado: str | None = Field(default=None, max_length=50)
+    direccion: str | None = Field(default=None, max_length=255)
+    is_active: bool | None = Field(default=None)
+
+
+class Warehouse(WarehouseBase, table=True):
+    __tablename__ = "warehouses"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    bins: list["Bin"] = Relationship(back_populates="warehouse")
+
+
+class WarehousePublic(WarehouseBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class WarehousesPublic(SQLModel):
+    data: list[WarehousePublic]
+    count: int
+
+
+# Bin models
+class BinBase(SQLModel):
+    nombre: str = Field(max_length=100)
+    x: str = Field(max_length=15, default="0")
+    y: str = Field(max_length=15, default="0")
+    z: str = Field(max_length=15, default="0")
+    warehouse_id: uuid.UUID
+    is_active: bool = True
+
+
+class BinCreate(BinBase):
+    pass
+
+
+class BinUpdate(BinBase):
+    nombre: str | None = Field(default=None, max_length=100)
+    x: str | None = Field(default=None, max_length=15)
+    y: str | None = Field(default=None, max_length=15)
+    z: str | None = Field(default=None, max_length=15)
+    warehouse_id: uuid.UUID | None = Field(default=None)
+    is_active: bool | None = Field(default=None)
+
+
+class Bin(BinBase, table=True):
+    __tablename__ = "bins"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    warehouse_id: uuid.UUID = Field(foreign_key="warehouses.id")
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    warehouse: Optional["Warehouse"] = Relationship(back_populates="bins")
+
+
+class BinPublic(BinBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class BinsPublic(SQLModel):
+    data: list[BinPublic]
+    count: int
+
+
 # Generic message
 class Message(SQLModel):
     message: str

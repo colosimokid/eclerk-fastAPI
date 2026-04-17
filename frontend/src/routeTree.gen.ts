@@ -18,6 +18,8 @@ import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
 import { Route as LayoutHierarchyRouteImport } from './routes/_layout/hierarchy'
+import { Route as LayoutGeneralMarcasRouteImport } from './routes/_layout/general/marcas'
+import { Route as LayoutGeneralDepositosRouteImport } from './routes/_layout/general/depositos'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -68,6 +70,16 @@ const LayoutHierarchyRoute = LayoutHierarchyRouteImport.update({
   path: '/hierarchy',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutGeneralMarcasRoute = LayoutGeneralMarcasRouteImport.update({
+  id: '/general/marcas',
+  path: '/general/marcas',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutGeneralDepositosRoute = LayoutGeneralDepositosRouteImport.update({
+  id: '/general/depositos',
+  path: '/general/depositos',
+  getParentRoute: () => LayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
@@ -79,6 +91,8 @@ export interface FileRoutesByFullPath {
   '/hierarchy': typeof LayoutHierarchyRoute
   '/items': typeof LayoutItemsRoute
   '/settings': typeof LayoutSettingsRoute
+  '/general/marcas': typeof LayoutGeneralMarcasRoute
+  '/general/depositos': typeof LayoutGeneralDepositosRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -89,6 +103,8 @@ export interface FileRoutesByTo {
   '/hierarchy': typeof LayoutHierarchyRoute
   '/items': typeof LayoutItemsRoute
   '/settings': typeof LayoutSettingsRoute
+  '/general/marcas': typeof LayoutGeneralMarcasRoute
+  '/general/depositos': typeof LayoutGeneralDepositosRoute
   '/': typeof LayoutIndexRoute
 }
 export interface FileRoutesById {
@@ -102,6 +118,8 @@ export interface FileRoutesById {
   '/_layout/hierarchy': typeof LayoutHierarchyRoute
   '/_layout/items': typeof LayoutItemsRoute
   '/_layout/settings': typeof LayoutSettingsRoute
+  '/_layout/general/marcas': typeof LayoutGeneralMarcasRoute
+  '/_layout/general/depositos': typeof LayoutGeneralDepositosRoute
   '/_layout/': typeof LayoutIndexRoute
 }
 export interface FileRouteTypes {
@@ -115,6 +133,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/items'
     | '/settings'
+    | '/general/marcas'
+    | '/general/depositos'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -125,6 +145,8 @@ export interface FileRouteTypes {
     | '/hierarchy'
     | '/items'
     | '/settings'
+    | '/general/marcas'
+    | '/general/depositos'
     | '/'
   id:
     | '__root__'
@@ -137,6 +159,8 @@ export interface FileRouteTypes {
     | '/_layout/hierarchy'
     | '/_layout/items'
     | '/_layout/settings'
+    | '/_layout/general/marcas'
+    | '/_layout/general/depositos'
     | '/_layout/'
   fileRoutesById: FileRoutesById
 }
@@ -220,6 +244,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutHierarchyRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/general/marcas': {
+      id: '/_layout/general/marcas'
+      path: '/general/marcas'
+      fullPath: '/general/marcas'
+      preLoaderRoute: typeof LayoutGeneralMarcasRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/general/depositos': {
+      id: '/_layout/general/depositos'
+      path: '/general/depositos'
+      fullPath: '/general/depositos'
+      preLoaderRoute: typeof LayoutGeneralDepositosRouteImport
+      parentRoute: typeof LayoutRoute
+    }
   }
 }
 
@@ -228,6 +266,8 @@ interface LayoutRouteChildren {
   LayoutHierarchyRoute: typeof LayoutHierarchyRoute
   LayoutItemsRoute: typeof LayoutItemsRoute
   LayoutSettingsRoute: typeof LayoutSettingsRoute
+  LayoutGeneralMarcasRoute: typeof LayoutGeneralMarcasRoute
+  LayoutGeneralDepositosRoute: typeof LayoutGeneralDepositosRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
 }
 
@@ -236,6 +276,8 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutHierarchyRoute: LayoutHierarchyRoute,
   LayoutItemsRoute: LayoutItemsRoute,
   LayoutSettingsRoute: LayoutSettingsRoute,
+  LayoutGeneralMarcasRoute: LayoutGeneralMarcasRoute,
+  LayoutGeneralDepositosRoute: LayoutGeneralDepositosRoute,
   LayoutIndexRoute: LayoutIndexRoute,
 }
 

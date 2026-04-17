@@ -19,6 +19,12 @@ from app.models import (
     Brand,
     BrandCreate,
     BrandUpdate,
+    Warehouse,
+    WarehouseCreate,
+    WarehouseUpdate,
+    Bin,
+    BinCreate,
+    BinUpdate,
     User,
     UserCreate,
     UserUpdate,
@@ -216,4 +222,69 @@ def get_sub_sections_by_section(
     *, session: Session, section_id: uuid.UUID, skip: int = 0, limit: int = 100
 ) -> list[SubSection]:
     statement = select(SubSection).where(SubSection.section_id == section_id).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+# Warehouse CRUD
+def create_warehouse(*, session: Session, warehouse_create: WarehouseCreate) -> Warehouse:
+    db_obj = Warehouse.model_validate(warehouse_create)
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj
+
+
+def update_warehouse(
+    *, session: Session, db_warehouse: Warehouse, warehouse_in: WarehouseUpdate
+) -> Any:
+    warehouse_data = warehouse_in.model_dump(exclude_unset=True)
+    db_warehouse.sqlmodel_update(warehouse_data)
+    session.add(db_warehouse)
+    session.commit()
+    session.refresh(db_warehouse)
+    return db_warehouse
+
+
+def get_warehouse_by_id(*, session: Session, warehouse_id: uuid.UUID) -> Warehouse | None:
+    statement = select(Warehouse).where(Warehouse.id == warehouse_id)
+    return session.exec(statement).first()
+
+
+def get_warehouses(*, session: Session, skip: int = 0, limit: int = 100) -> list[Warehouse]:
+    statement = select(Warehouse).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+# Bin CRUD
+def create_bin(*, session: Session, bin_create: BinCreate) -> Bin:
+    db_obj = Bin.model_validate(bin_create)
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj
+
+
+def update_bin(*, session: Session, db_bin: Bin, bin_in: BinUpdate) -> Any:
+    bin_data = bin_in.model_dump(exclude_unset=True)
+    db_bin.sqlmodel_update(bin_data)
+    session.add(db_bin)
+    session.commit()
+    session.refresh(db_bin)
+    return db_bin
+
+
+def get_bin_by_id(*, session: Session, bin_id: uuid.UUID) -> Bin | None:
+    statement = select(Bin).where(Bin.id == bin_id)
+    return session.exec(statement).first()
+
+
+def get_bins(*, session: Session, skip: int = 0, limit: int = 100) -> list[Bin]:
+    statement = select(Bin).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+def get_bins_by_warehouse(
+    *, session: Session, warehouse_id: uuid.UUID, skip: int = 0, limit: int = 100
+) -> list[Bin]:
+    statement = select(Bin).where(Bin.warehouse_id == warehouse_id).offset(skip).limit(limit)
     return list(session.exec(statement))

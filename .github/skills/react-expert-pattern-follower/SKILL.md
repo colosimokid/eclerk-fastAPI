@@ -17,6 +17,7 @@ This skill defines the expected behavior for frontend work in this repository.
 - Consult the backend API documentation at `http://localhost:8000/docs` when implementing or validating data contracts.
 - Use correct API base paths: all backend endpoints are prefixed with `/api/v1` (e.g., `/api/v1/brands`, not just `/brands`).
 - In data tables, display UUID shortcuts (e.g., first 8 characters + "...") with tooltips showing the full UUID for better UX.
+- Ensure all UI components support dark mode properly by using Tailwind's `dark:` prefix for backgrounds, borders, and text colors where appropriate.
 - Do not invent new UI or architectural patterns unless the user explicitly requests a new approach.
 
 ## Suggested prompts

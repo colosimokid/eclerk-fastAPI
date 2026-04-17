@@ -1,5 +1,7 @@
+import { Fragment, type ReactNode } from "react"
 import {
   type ColumnDef,
+  type Row,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -32,11 +34,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  renderRowDetail?: (row: Row<TData>) => ReactNode
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  renderRowDetail,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -69,13 +73,16 @@ export function DataTable<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
+              <Fragment key={row.id}>
+                <TableRow>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+                {renderRowDetail?.(row)}
+              </Fragment>
             ))
           ) : (
             <TableRow className="hover:bg-transparent">

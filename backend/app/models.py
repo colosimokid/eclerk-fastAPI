@@ -80,6 +80,7 @@ class Category(SQLModel, table=True):
         sa_type=DateTime(timezone=True),  # type: ignore
     )
     sections: list["Section"] = Relationship(back_populates="category")
+    products: list["Product"] = Relationship(back_populates="category")
 
 
 class Section(SQLModel, table=True):
@@ -99,6 +100,7 @@ class Section(SQLModel, table=True):
     )
     category: Optional["Category"] = Relationship(back_populates="sections")
     sub_sections: list["SubSection"] = Relationship(back_populates="section")
+    products: list["Product"] = Relationship(back_populates="section")
 
 
 class SubSection(SQLModel, table=True):
@@ -117,6 +119,7 @@ class SubSection(SQLModel, table=True):
         sa_type=DateTime(timezone=True),  # type: ignore
     )
     section: Optional["Section"] = Relationship(back_populates="sub_sections")
+    products: list["Product"] = Relationship(back_populates="sub_section")
 
 
 class Brand(SQLModel, table=True):
@@ -133,6 +136,7 @@ class Brand(SQLModel, table=True):
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
     )
+    products: list["Product"] = Relationship(back_populates="brand")
 
 
 # Properties to return via API, id is always required
@@ -387,6 +391,82 @@ class BinPublic(BinBase):
 
 class BinsPublic(SQLModel):
     data: list[BinPublic]
+    count: int
+
+
+# Product models
+class ProductBase(SQLModel):
+    category_id: uuid.UUID
+    section_id: uuid.UUID
+    sub_section_id: uuid.UUID | None = None
+    codigo: str = Field(max_length=50)
+    referencia: str | None = Field(default=None, max_length=100)
+    descripcion: str = Field(max_length=255)
+    descripcion_adicional: str | None = Field(default=None)
+    cod_barras_1: str | None = Field(default=None, max_length=50)
+    cod_barras_2: str | None = Field(default=None, max_length=50)
+    cod_barras_3: str | None = Field(default=None, max_length=50)
+    brand_id: uuid.UUID | None = None
+    ultimo_coste: float | None = Field(default=None, ge=0)
+    peso: float | None = Field(default=None, ge=0)
+    impuesto_compra: float = Field(default=0.0, ge=0, le=100)
+    impuesto_venta: float = Field(default=0.0, ge=0, le=100)
+    is_active: bool = True
+
+
+class ProductCreate(ProductBase):
+    pass
+
+
+class ProductUpdate(ProductBase):
+    category_id: uuid.UUID | None = Field(default=None)
+    section_id: uuid.UUID | None = Field(default=None)
+    sub_section_id: uuid.UUID | None = Field(default=None)
+    codigo: str | None = Field(default=None, max_length=50)
+    referencia: str | None = Field(default=None, max_length=100)
+    descripcion: str | None = Field(default=None, max_length=255)
+    descripcion_adicional: str | None = Field(default=None)
+    cod_barras_1: str | None = Field(default=None, max_length=50)
+    cod_barras_2: str | None = Field(default=None, max_length=50)
+    cod_barras_3: str | None = Field(default=None, max_length=50)
+    brand_id: uuid.UUID | None = Field(default=None)
+    ultimo_coste: float | None = Field(default=None, ge=0)
+    peso: float | None = Field(default=None, ge=0)
+    impuesto_compra: float | None = Field(default=None, ge=0, le=100)
+    impuesto_venta: float | None = Field(default=None, ge=0, le=100)
+    is_active: bool | None = Field(default=None)
+
+
+class Product(ProductBase, table=True):
+    __tablename__ = "products"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    category_id: uuid.UUID = Field(foreign_key="categories.id")
+    section_id: uuid.UUID = Field(foreign_key="sections.id")
+    sub_section_id: uuid.UUID | None = Field(default=None, foreign_key="sub_sections.id")
+    brand_id: uuid.UUID | None = Field(default=None, foreign_key="brands.id")
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    category: Optional["Category"] = Relationship(back_populates="products")
+    section: Optional["Section"] = Relationship(back_populates="products")
+    sub_section: Optional["SubSection"] = Relationship(back_populates="products")
+    brand: Optional["Brand"] = Relationship(back_populates="products")
+
+
+class ProductPublic(ProductBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class ProductsPublic(SQLModel):
+    data: list[ProductPublic]
     count: int
 
 

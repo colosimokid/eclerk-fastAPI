@@ -25,6 +25,9 @@ from app.models import (
     Bin,
     BinCreate,
     BinUpdate,
+    Product,
+    ProductCreate,
+    ProductUpdate,
     User,
     UserCreate,
     UserUpdate,
@@ -287,4 +290,62 @@ def get_bins_by_warehouse(
     *, session: Session, warehouse_id: uuid.UUID, skip: int = 0, limit: int = 100
 ) -> list[Bin]:
     statement = select(Bin).where(Bin.warehouse_id == warehouse_id).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+# Product CRUD
+def create_product(*, session: Session, product_create: ProductCreate) -> Product:
+    db_obj = Product.model_validate(product_create)
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj
+
+
+def update_product(
+    *, session: Session, db_product: Product, product_in: ProductUpdate
+) -> Any:
+    product_data = product_in.model_dump(exclude_unset=True)
+    db_product.sqlmodel_update(product_data)
+    session.add(db_product)
+    session.commit()
+    session.refresh(db_product)
+    return db_product
+
+
+def get_product_by_id(*, session: Session, product_id: uuid.UUID) -> Product | None:
+    statement = select(Product).where(Product.id == product_id)
+    return session.exec(statement).first()
+
+
+def get_products(*, session: Session, skip: int = 0, limit: int = 100) -> list[Product]:
+    statement = select(Product).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+def get_products_by_category(
+    *, session: Session, category_id: uuid.UUID, skip: int = 0, limit: int = 100
+) -> list[Product]:
+    statement = select(Product).where(Product.category_id == category_id).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+def get_products_by_section(
+    *, session: Session, section_id: uuid.UUID, skip: int = 0, limit: int = 100
+) -> list[Product]:
+    statement = select(Product).where(Product.section_id == section_id).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+def get_products_by_sub_section(
+    *, session: Session, sub_section_id: uuid.UUID, skip: int = 0, limit: int = 100
+) -> list[Product]:
+    statement = select(Product).where(Product.sub_section_id == sub_section_id).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+def get_products_by_brand(
+    *, session: Session, brand_id: uuid.UUID, skip: int = 0, limit: int = 100
+) -> list[Product]:
+    statement = select(Product).where(Product.brand_id == brand_id).offset(skip).limit(limit)
     return list(session.exec(statement))

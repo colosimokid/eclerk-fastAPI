@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import bins, brands, categories, items, login, private, products, sections, sub_sections, users, utils, warehouses
+from app.api.routes import bins, brands, categories, items, login, private, products, sections, storage_details, sub_sections, users, utils, warehouses
 from app.core.config import settings
 
 api_router = APIRouter()
@@ -13,6 +13,7 @@ api_router.include_router(brands.router)
 api_router.include_router(sections.router)
 api_router.include_router(sub_sections.router)
 api_router.include_router(products.router)
+api_router.include_router(storage_details.router)
 api_router.include_router(warehouses.router)
 api_router.include_router(bins.router)
 

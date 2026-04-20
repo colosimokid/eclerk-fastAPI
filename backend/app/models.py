@@ -381,6 +381,7 @@ class Bin(BinBase, table=True):
         sa_type=DateTime(timezone=True),  # type: ignore
     )
     warehouse: Optional["Warehouse"] = Relationship(back_populates="bins")
+    storage_details: list["StorageDetail"] = Relationship(back_populates="bin")
 
 
 class BinPublic(BinBase):
@@ -457,6 +458,7 @@ class Product(ProductBase, table=True):
     section: Optional["Section"] = Relationship(back_populates="products")
     sub_section: Optional["SubSection"] = Relationship(back_populates="products")
     brand: Optional["Brand"] = Relationship(back_populates="products")
+    storage_details: list["StorageDetail"] = Relationship(back_populates="product")
 
 
 class ProductPublic(ProductBase):
@@ -467,6 +469,58 @@ class ProductPublic(ProductBase):
 
 class ProductsPublic(SQLModel):
     data: list[ProductPublic]
+    count: int
+
+
+# Storage detail models
+class StorageDetailBase(SQLModel):
+    product_id: uuid.UUID
+    bin_id: uuid.UUID
+    qty_on_hand: float = Field(default=0.0, ge=0)
+    qty_order_on_hand: float = Field(default=0.0, ge=0)
+    date_last_inventory: datetime | None = None
+    is_active: bool = True
+
+
+class StorageDetailCreate(StorageDetailBase):
+    pass
+
+
+class StorageDetailUpdate(StorageDetailBase):
+    product_id: uuid.UUID | None = Field(default=None)
+    bin_id: uuid.UUID | None = Field(default=None)
+    qty_on_hand: float | None = Field(default=None, ge=0)
+    qty_order_on_hand: float | None = Field(default=None, ge=0)
+    date_last_inventory: datetime | None = None
+    is_active: bool | None = Field(default=None)
+
+
+class StorageDetail(StorageDetailBase, table=True):
+    __tablename__ = "storage_details"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    product_id: uuid.UUID = Field(foreign_key="products.id")
+    bin_id: uuid.UUID = Field(foreign_key="bins.id")
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    updated_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    product: Optional["Product"] = Relationship(back_populates="storage_details")
+    bin: Optional["Bin"] = Relationship(back_populates="storage_details")
+
+
+class StorageDetailPublic(StorageDetailBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+class StorageDetailsPublic(SQLModel):
+    data: list[StorageDetailPublic]
     count: int
 
 

@@ -28,6 +28,10 @@ from app.models import (
     Product,
     ProductCreate,
     ProductUpdate,
+    StorageDetail,
+    StorageDetailCreate,
+    StorageDetailPublic,
+    StorageDetailUpdate,
     User,
     UserCreate,
     UserUpdate,
@@ -348,4 +352,39 @@ def get_products_by_brand(
     *, session: Session, brand_id: uuid.UUID, skip: int = 0, limit: int = 100
 ) -> list[Product]:
     statement = select(Product).where(Product.brand_id == brand_id).offset(skip).limit(limit)
+    return list(session.exec(statement))
+
+
+# StorageDetail CRUD
+
+def create_storage_detail(*, session: Session, storage_detail_create: StorageDetailCreate) -> StorageDetail:
+    db_obj = StorageDetail.model_validate(storage_detail_create)
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj
+
+
+def update_storage_detail(
+    *, session: Session, db_storage_detail: StorageDetail, storage_detail_in: StorageDetailUpdate
+) -> Any:
+    storage_detail_data = storage_detail_in.model_dump(exclude_unset=True)
+    db_storage_detail.sqlmodel_update(storage_detail_data)
+    session.add(db_storage_detail)
+    session.commit()
+    session.refresh(db_storage_detail)
+    return db_storage_detail
+
+
+def get_storage_detail_by_id(
+    *, session: Session, storage_detail_id: uuid.UUID
+) -> StorageDetail | None:
+    statement = select(StorageDetail).where(StorageDetail.id == storage_detail_id)
+    return session.exec(statement).first()
+
+
+def get_storage_details(
+    *, session: Session, skip: int = 0, limit: int = 100
+) -> list[StorageDetail]:
+    statement = select(StorageDetail).offset(skip).limit(limit)
     return list(session.exec(statement))

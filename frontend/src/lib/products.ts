@@ -69,7 +69,7 @@ export type ProductUpdate = {
 }
 
 export const ProductsService = {
-  readProducts: async ({ skip = 0, limit = 100 } = {}) => {
+  readProducts: async ({ skip = 0, limit = 10000 } = {}) => {
     const response = await axios.get<ProductPublic[]>(`${apiBase}/api/v1/products`, {
       headers: getAuthHeaders(),
       params: { skip, limit },

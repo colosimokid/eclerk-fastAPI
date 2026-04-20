@@ -26,7 +26,7 @@ router = APIRouter(prefix="/sub-sections", tags=["sub-sections"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[SubSectionPublic],
 )
-def read_sub_sections(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_sub_sections(session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Retrieve sub-sections.
     """

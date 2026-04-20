@@ -124,8 +124,10 @@ def get_category_by_id(*, session: Session, category_id: uuid.UUID) -> Category 
     return session.exec(statement).first()
 
 
-def get_categories(*, session: Session, skip: int = 0, limit: int = 100) -> list[Category]:
-    statement = select(Category).offset(skip).limit(limit)
+def get_categories(*, session: Session, skip: int = 0, limit: int | None = None) -> list[Category]:
+    statement = select(Category).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
@@ -154,15 +156,19 @@ def get_section_by_id(*, session: Session, section_id: uuid.UUID) -> Section | N
     return session.exec(statement).first()
 
 
-def get_sections(*, session: Session, skip: int = 0, limit: int = 100) -> list[Section]:
-    statement = select(Section).offset(skip).limit(limit)
+def get_sections(*, session: Session, skip: int = 0, limit: int | None = None) -> list[Section]:
+    statement = select(Section).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
 def get_sections_by_category(
-    *, session: Session, category_id: uuid.UUID, skip: int = 0, limit: int = 100
+    *, session: Session, category_id: uuid.UUID, skip: int = 0, limit: int | None = None
 ) -> list[Section]:
-    statement = select(Section).where(Section.category_id == category_id).offset(skip).limit(limit)
+    statement = select(Section).where(Section.category_id == category_id).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
@@ -185,13 +191,10 @@ def update_brand(*, session: Session, db_brand: Brand, brand_in: BrandUpdate) ->
     return db_brand
 
 
-def get_brand_by_id(*, session: Session, brand_id: uuid.UUID) -> Brand | None:
-    statement = select(Brand).where(Brand.id == brand_id)
-    return session.exec(statement).first()
-
-
-def get_brands(*, session: Session, skip: int = 0, limit: int = 100) -> list[Brand]:
-    statement = select(Brand).offset(skip).limit(limit)
+def get_brands(*, session: Session, skip: int = 0, limit: int | None = None) -> list[Brand]:
+    statement = select(Brand).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
@@ -215,20 +218,19 @@ def update_sub_section(
     return db_sub_section
 
 
-def get_sub_section_by_id(*, session: Session, sub_section_id: uuid.UUID) -> SubSection | None:
-    statement = select(SubSection).where(SubSection.id == sub_section_id)
-    return session.exec(statement).first()
-
-
-def get_sub_sections(*, session: Session, skip: int = 0, limit: int = 100) -> list[SubSection]:
-    statement = select(SubSection).offset(skip).limit(limit)
+def get_sub_sections(*, session: Session, skip: int = 0, limit: int | None = None) -> list[SubSection]:
+    statement = select(SubSection).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
 def get_sub_sections_by_section(
-    *, session: Session, section_id: uuid.UUID, skip: int = 0, limit: int = 100
+    *, session: Session, section_id: uuid.UUID, skip: int = 0, limit: int | None = None
 ) -> list[SubSection]:
-    statement = select(SubSection).where(SubSection.section_id == section_id).offset(skip).limit(limit)
+    statement = select(SubSection).where(SubSection.section_id == section_id).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
@@ -249,16 +251,18 @@ def update_warehouse(
     session.add(db_warehouse)
     session.commit()
     session.refresh(db_warehouse)
-    return db_warehouse
-
-
-def get_warehouse_by_id(*, session: Session, warehouse_id: uuid.UUID) -> Warehouse | None:
-    statement = select(Warehouse).where(Warehouse.id == warehouse_id)
+def get_warehouses(*, session: Session, skip: int = 0, limit: int | None = None) -> list[Warehouse]:
+    statement = select(Warehouse).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
+    return list(session.exec(statement))
     return session.exec(statement).first()
 
 
-def get_warehouses(*, session: Session, skip: int = 0, limit: int = 100) -> list[Warehouse]:
-    statement = select(Warehouse).offset(skip).limit(limit)
+def get_warehouses(*, session: Session, skip: int = 0, limit: int | None = None) -> list[Warehouse]:
+    statement = select(Warehouse).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
@@ -271,7 +275,9 @@ def create_bin(*, session: Session, bin_create: BinCreate) -> Bin:
     return db_obj
 
 
-def update_bin(*, session: Session, db_bin: Bin, bin_in: BinUpdate) -> Any:
+def update_bin(
+    *, session: Session, db_bin: Bin, bin_in: BinUpdate
+) -> Any:
     bin_data = bin_in.model_dump(exclude_unset=True)
     db_bin.sqlmodel_update(bin_data)
     session.add(db_bin)
@@ -285,15 +291,19 @@ def get_bin_by_id(*, session: Session, bin_id: uuid.UUID) -> Bin | None:
     return session.exec(statement).first()
 
 
-def get_bins(*, session: Session, skip: int = 0, limit: int = 100) -> list[Bin]:
-    statement = select(Bin).offset(skip).limit(limit)
+def get_bins(*, session: Session, skip: int = 0, limit: int | None = None) -> list[Bin]:
+    statement = select(Bin).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
 def get_bins_by_warehouse(
-    *, session: Session, warehouse_id: uuid.UUID, skip: int = 0, limit: int = 100
+    *, session: Session, warehouse_id: uuid.UUID, skip: int = 0, limit: int | None = None
 ) -> list[Bin]:
-    statement = select(Bin).where(Bin.warehouse_id == warehouse_id).offset(skip).limit(limit)
+    statement = select(Bin).where(Bin.warehouse_id == warehouse_id).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
@@ -317,41 +327,51 @@ def update_product(
     return db_product
 
 
+def get_products(*, session: Session, skip: int = 0, limit: int | None = None) -> list[Product]:
+    statement = select(Product).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
+    return list(session.exec(statement))
+
+
 def get_product_by_id(*, session: Session, product_id: uuid.UUID) -> Product | None:
     statement = select(Product).where(Product.id == product_id)
     return session.exec(statement).first()
 
 
-def get_products(*, session: Session, skip: int = 0, limit: int = 100) -> list[Product]:
-    statement = select(Product).offset(skip).limit(limit)
-    return list(session.exec(statement))
-
-
 def get_products_by_category(
-    *, session: Session, category_id: uuid.UUID, skip: int = 0, limit: int = 100
+    *, session: Session, category_id: uuid.UUID, skip: int = 0, limit: int | None = None
 ) -> list[Product]:
-    statement = select(Product).where(Product.category_id == category_id).offset(skip).limit(limit)
+    statement = select(Product).where(Product.category_id == category_id).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
 def get_products_by_section(
-    *, session: Session, section_id: uuid.UUID, skip: int = 0, limit: int = 100
+    *, session: Session, section_id: uuid.UUID, skip: int = 0, limit: int | None = None
 ) -> list[Product]:
-    statement = select(Product).where(Product.section_id == section_id).offset(skip).limit(limit)
+    statement = select(Product).where(Product.section_id == section_id).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
 def get_products_by_sub_section(
-    *, session: Session, sub_section_id: uuid.UUID, skip: int = 0, limit: int = 100
+    *, session: Session, sub_section_id: uuid.UUID, skip: int = 0, limit: int | None = None
 ) -> list[Product]:
-    statement = select(Product).where(Product.sub_section_id == sub_section_id).offset(skip).limit(limit)
+    statement = select(Product).where(Product.sub_section_id == sub_section_id).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
 def get_products_by_brand(
-    *, session: Session, brand_id: uuid.UUID, skip: int = 0, limit: int = 100
+    *, session: Session, brand_id: uuid.UUID, skip: int = 0, limit: int | None = None
 ) -> list[Product]:
-    statement = select(Product).where(Product.brand_id == brand_id).offset(skip).limit(limit)
+    statement = select(Product).where(Product.brand_id == brand_id).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))
 
 
@@ -374,17 +394,14 @@ def update_storage_detail(
     session.commit()
     session.refresh(db_storage_detail)
     return db_storage_detail
-
-
-def get_storage_detail_by_id(
-    *, session: Session, storage_detail_id: uuid.UUID
-) -> StorageDetail | None:
-    statement = select(StorageDetail).where(StorageDetail.id == storage_detail_id)
-    return session.exec(statement).first()
-
-
 def get_storage_details(
-    *, session: Session, skip: int = 0, limit: int = 100
+    *, session: Session, skip: int = 0, limit: int | None = None
 ) -> list[StorageDetail]:
-    statement = select(StorageDetail).offset(skip).limit(limit)
+    statement = select(StorageDetail).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
+    return list(session.exec(statement))
+    statement = select(StorageDetail).offset(skip)
+    if limit is not None:
+        statement = statement.limit(limit)
     return list(session.exec(statement))

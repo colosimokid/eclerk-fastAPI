@@ -14,7 +14,7 @@ router = APIRouter(prefix="/warehouses", tags=["warehouse"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[WarehousePublic],
 )
-def read_warehouses(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_warehouses(session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Retrieve warehouses.
     """

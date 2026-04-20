@@ -14,7 +14,7 @@ router = APIRouter(prefix="/products", tags=["products"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[ProductPublic],
 )
-def read_products(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_products(session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Retrieve products.
     """

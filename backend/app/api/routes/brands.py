@@ -14,7 +14,7 @@ router = APIRouter(prefix="/brands", tags=["brands"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[BrandPublic],
 )
-def read_brands(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_brands(session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Retrieve brands.
     """

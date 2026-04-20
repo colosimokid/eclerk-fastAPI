@@ -26,7 +26,7 @@ router = APIRouter(prefix="/categories", tags=["categories"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[CategoryPublic],
 )
-def read_categories(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_categories(session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Retrieve categories.
     """

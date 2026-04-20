@@ -14,7 +14,7 @@ router = APIRouter(prefix="/bins", tags=["bin"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[BinPublic],
 )
-def read_bins(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_bins(session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Retrieve bins.
     """
@@ -92,7 +92,7 @@ def delete_bin(session: SessionDep, bin_id: uuid.UUID) -> Any:
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[BinPublic],
 )
-def read_bins_by_warehouse(warehouse_id: uuid.UUID, session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_bins_by_warehouse(warehouse_id: uuid.UUID, session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Get bins for a specific warehouse.
     """

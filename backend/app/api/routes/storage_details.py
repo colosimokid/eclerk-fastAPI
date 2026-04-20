@@ -14,7 +14,7 @@ router = APIRouter(prefix="/storage-details", tags=["storage-details"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=list[StorageDetailPublic],
 )
-def read_storage_details(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_storage_details(session: SessionDep, skip: int = 0, limit: int | None = None) -> Any:
     """
     Retrieve storage details.
     """

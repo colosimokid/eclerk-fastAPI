@@ -16,6 +16,7 @@ This skill defines the expected behavior for backend work in this repository.
 - Use preload data scripts like `backend/app/alembic/preload-categories-structure.md` when the user asks for initial data seeding.
 - Keep initial data preparation ready for production deployment with seed/preload scripts.
 - Always use the table name in `Field(foreign_key="table.column")`, not the class name. For example, use `"warehouses.id"` for the `Warehouse` table (where `__tablename__ = "warehouses"`), not `"Warehouse.id"`. This ensures SQLAlchemy can properly resolve foreign key relationships and avoid `NoForeignKeysError`.
+- Docker compilations are handled by the user in the terminal to save tokens.
 - Do not invent new backend patterns or architectural approaches unless explicitly requested.
 
 ## Suggested prompts

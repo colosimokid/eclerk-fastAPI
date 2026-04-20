@@ -21,8 +21,64 @@ CREATE TABLE IF NOT EXISTS public.product_migracion
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.product_migracion2
+ALTER TABLE IF EXISTS public.product_migracion
     OWNER to postgres;
+
+
+
+
+
+
+
+    -- =============================================
+-- 3. Insertar en la tabla products de producción
+-- =============================================
+INSERT INTO public.products (
+    id,                      -- UUID generado automáticamente
+    category_id,
+    section_id,
+    sub_section_id,
+    codigo,
+    referencia,
+    descripcion,
+    descripcion_adicional,
+    cod_barras_1,
+    cod_barras_2,
+    cod_barras_3,
+    brand_id,
+    is_active,
+    created_at,
+    updated_at
+)
+SELECT
+    public.uuid_generate_v4() AS id,                    -- ← Aquí está el uuid_generate_v4()
+    cat.id AS category_id,
+    sec.id AS section_id,
+    sub.id AS sub_section_id,
+    t.codigo,
+    t.referencia,
+    t.descripcion,
+    t.descripcion_adicional,
+    t.cod_barras_1,
+    t.cod_barras_2,
+    t.cod_barras_3,
+    b.id AS brand_id,
+    true AS is_active,
+    CURRENT_TIMESTAMP AS created_at,
+    CURRENT_TIMESTAMP AS updated_at
+FROM public.product_migracion t
+LEFT JOIN public.categories cat ON cat.nombre = t.categoria_nombre
+LEFT JOIN public.sections sec   ON sec.nombre = t.seccion_nombre
+LEFT JOIN public.sub_sections sub ON sub.nombre = t.subseccion_nombre
+LEFT JOIN public.brands b       ON b.nombre = t.brand_nombre     -- Cambia a b.nombre si es necesario
+WHERE t.referencia IS NOT NULL
+  AND t.descripcion IS NOT NULL
+ON CONFLICT DO NOTHING;
+
+
+
+
+
 
 --
 -- PostgreSQL database dump

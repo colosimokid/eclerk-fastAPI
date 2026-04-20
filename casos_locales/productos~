@@ -1,0 +1,220 @@
+CREATE TEMP TABLE temp_ventas (
+    "Fecha" TEXT,
+    "Hora" TEXT,
+    "Cliente" TEXT,
+    "Número Albarán" TEXT,
+    "Número Factura" TEXT,
+    "Uds." TEXT,
+    "Precio$" TEXT,
+    "Importe$" TEXT,
+    "Referencia" VARCHAR(100),
+    "Descripción" TEXT,
+    "Código Artículo" VARCHAR(50),
+    "Cód. Barras" VARCHAR(50),
+    "Cód. Barras 2" VARCHAR(50),
+    "Cód. Barras 3" VARCHAR(50),
+    "Descripción Adicional" TEXT,
+    "Departamento" TEXT,
+    "Seccion" VARCHAR(150),
+    "Família" VARCHAR(150),
+    "SubFamilia" VARCHAR(150),
+    "Marca" VARCHAR(100),
+    "Área de Negocio Factura" TEXT
+) ON COMMIT DROP;
+
+COPY temp_ventas 
+FROM '/tmp/ventasfm.csv'
+WITH (
+    FORMAT CSV, 
+    HEADER TRUE, 
+    DELIMITER ',', 
+    ENCODING 'UTF8', 
+    QUOTE '"',
+    NULL ''
+);
+
+
+
+
+
+CREATE TABLE temp_compras (
+    "Fecha" TEXT,
+    "Hora" TEXT,
+    "RIF" TEXT,
+    "Nombre Proveedor" TEXT,
+    "Num Albarán" TEXT,
+    "Num Factura" TEXT,
+    "Unidades" TEXT,
+    "Costo$" TEXT,
+    "Importe Total$" TEXT,
+    "Referencia" VARCHAR(100),
+    "Descripción" TEXT,
+    "Cód. Barras" VARCHAR(50),
+    "Cód Barras 2" VARCHAR(50),
+    "Cód Barras 3" VARCHAR(50),
+    "Departamento" TEXT,
+    "Seccion" VARCHAR(150),
+    "Família" VARCHAR(150),
+    "SubFamilia" VARCHAR(150),
+    "Serie" VARCHAR(100),           -- Primera columna "Serie" (usada como Marca)
+    "Serie2" VARCHAR(100),          -- Segunda columna "Serie" (renombrada)
+    "Código" VARCHAR(50),           -- Alternativa a Código Artículo
+    "OBSERVACIÓN" TEXT
+) ;
+
+
+-- =============================================
+-- 2. Cargar el CSV de compras (ajusta la ruta si es necesario)
+-- =============================================
+COPY temp_compras 
+FROM '/tmp/compras.csv'          -- ← Cambia esta ruta si tu archivo tiene otro nombre
+WITH (
+    FORMAT CSV, 
+    HEADER TRUE, 
+    DELIMITER ',', 
+    ENCODING 'UTF8', 
+    QUOTE '"',
+    NULL ''
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- Crear tabla temporal que coincida con tu CSV
+CREATE  TABLE temp_products (
+    referencia VARCHAR(100),
+    descripcion TEXT,
+    "Código Artículo" VARCHAR(50),
+    "Cód. Barras" VARCHAR(50),
+    "Cód. Barras 2" VARCHAR(50),
+    "Cód. Barras 3" VARCHAR(50),
+    Categoria VARCHAR(150),      -- viene de "Seccion" original
+    Seccion VARCHAR(150),        -- viene de "Família"
+    Subseccion VARCHAR(150),     -- viene de "SubFamilia"
+    Marca VARCHAR(100)
+) ;   -- se borra al terminar la sesión
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sin repetir
+
+-- =============================================
+-- INSERT CORREGIDO para temp_compras
+-- =============================================
+INSERT INTO products (
+    referencia,
+    descripcion,
+    codigo_articulo,
+    cod_barras,
+    cod_barras2,
+    cod_barras3,
+    marca,
+    descripcion_adicional,
+    categoria_id,
+    seccion_id,
+    subseccion_id
+)
+SELECT 
+    c."Referencia",
+    c."Descripción",
+    c."Código" AS codigo_articulo,                    -- Aquí estaba el error
+    c."Cód. Barras",
+    c."Cód Barras 2",
+    c."Cód Barras 3",
+    c."Serie" AS marca,                               -- Usamos la primera columna Serie
+    NULL AS descripcion_adicional,
+    cat.id AS categoria_id,
+    sec.id AS seccion_id,
+    sub.id AS subseccion_id
+FROM temp_compras c
+LEFT JOIN categories cat ON cat.name = c."Seccion"
+LEFT JOIN sections sec 
+    ON sec.category_id = cat.id 
+   AND sec.name = c."Família"
+LEFT JOIN sub_sections sub 
+    ON sub.section_id = sec.id 
+   AND sub.name = c."SubFamilia"
+WHERE c."Referencia" IS NOT NULL 
+  AND c."Descripción" IS NOT NULL
+  AND NOT EXISTS (
+        SELECT 1 
+        FROM products p 
+        WHERE p.referencia = c."Referencia" 
+          AND p.descripcion = c."Descripción"
+      )
+ON CONFLICT (referencia, descripcion) 
+DO NOTHING;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  CREATE TABLE IF NOT EXISTS public.temp_products
+  (
+      id integer NOT NULL ,
+      referencia character varying(100) COLLATE pg_catalog."default",
+      descripcion text COLLATE pg_catalog."default",
+      codigo_articulo character varying(50) COLLATE pg_catalog."default",
+      cod_barras character varying(50) COLLATE pg_catalog."default",
+      cod_barras2 character varying(50) COLLATE pg_catalog."default",
+      cod_barras3 character varying(50) COLLATE pg_catalog."default",
+      marca character varying(100) COLLATE pg_catalog."default",
+      descripcion_adicional text COLLATE pg_catalog."default",
+      categoria_id integer,
+      seccion_id integer,
+      subseccion_id integer,
+      CONSTRAINT products_pkey2 PRIMARY KEY (id)
+      
+  );

@@ -395,13 +395,41 @@ def update_storage_detail(
     session.refresh(db_storage_detail)
     return db_storage_detail
 def get_storage_details(
+
     *, session: Session, skip: int = 0, limit: int | None = None
 ) -> list[StorageDetail]:
     statement = select(StorageDetail).offset(skip)
     if limit is not None:
         statement = statement.limit(limit)
     return list(session.exec(statement))
-    statement = select(StorageDetail).offset(skip)
+
+
+def search_storage_details(
+    *, session: Session,
+    warehouse_id: uuid.UUID | None = None,
+    bin_id: uuid.UUID | None = None,
+    product_query: str | None = None,
+    skip: int = 0,
+    limit: int | None = None
+) -> list[StorageDetail]:
+    from app.models import Bin, Product
+    statement = select(StorageDetail)
+    if bin_id:
+        statement = statement.where(StorageDetail.bin_id == bin_id)
+    elif warehouse_id:
+        statement = statement.join(Bin, StorageDetail.bin_id == Bin.id)
+        statement = statement.where(Bin.warehouse_id == warehouse_id)
+    if product_query:
+        statement = statement.join(Product, StorageDetail.product_id == Product.id)
+        like = f"%{product_query}%"
+        statement = statement.where(
+            (Product.codigo.ilike(like)) |
+            (Product.referencia.ilike(like)) |
+            (Product.descripcion.ilike(like)) |
+            (Product.cod_barras_1.ilike(like)) |
+            (Product.cod_barras_2.ilike(like))
+        )
+    statement = statement.offset(skip)
     if limit is not None:
         statement = statement.limit(limit)
     return list(session.exec(statement))

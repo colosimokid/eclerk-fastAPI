@@ -3,10 +3,46 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from app import crud
+
+from app.api.deps import (
+    CurrentUser,
+    SessionDep,
+    get_current_active_superuser,
+)
+
+from app.models import (
+    StorageDetailPublic,
+)
+from fastapi import Query
+router = APIRouter(prefix="/storage_details", tags=["storage_details"])
+
+@router.get(
+    "/search",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=list[StorageDetailPublic],
+)
+def search_storage_details(
+    session: SessionDep,
+    warehouse_id: uuid.UUID | None = Query(None),
+    bin_id: uuid.UUID | None = Query(None),
+    product_query: str | None = Query(None),
+    skip: int = 0,
+    limit: int | None = None,
+) -> Any:
+    """
+    Search storage details by warehouse, bin, and product fields.
+    """
+    return crud.search_storage_details(
+        session=session,
+        warehouse_id=warehouse_id,
+        bin_id=bin_id,
+        product_query=product_query,
+        skip=skip,
+        limit=limit,
+    )
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.models import StorageDetailCreate, StorageDetailPublic, StorageDetailUpdate, Message
 
-router = APIRouter(prefix="/storage-details", tags=["storage-details"])
 
 
 @router.get(

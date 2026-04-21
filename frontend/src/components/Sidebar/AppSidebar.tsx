@@ -1,4 +1,4 @@
-import { Home, Layers, ShoppingCart, Truck, Users, GitBranch } from "lucide-react"
+import { Home, Layers, ShoppingCart, Truck, Users, GitBranch, Package } from "lucide-react"
 
 import { SidebarAppearance } from "@/components/Common/Appearance"
 import { Logo } from "@/components/Common/Logo"
@@ -46,6 +46,16 @@ const sidebarItems: Item[] = [
       { title: "Orden de compra", path: "/ventas/orden-de-compra" },
       { title: "Factura (cliente)", path: "/ventas/factura-cliente" },
       { title: "Devolucion (Cliente)", path: "/ventas/devolucion-cliente" },
+    ],
+  },
+  {
+    icon: Package,
+    title: "Inventario",
+    path: "/inventario",
+    subItems: [
+      { title: "Inventario", path: "/inventario/inventario" },
+      { title: "Movimiento", path: "/inventario/movimiento" },
+      { title: "Ajuste", path: "/inventario/ajuste" },
     ],
   },
 ]

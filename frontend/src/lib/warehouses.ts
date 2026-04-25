@@ -33,10 +33,10 @@ export type WarehouseUpdate = {
 }
 
 export const WarehousesService = {
-  readWarehouses: async ({ skip = 0, limit = 100 } = {}) => {
+  readWarehouses: async ({ skip = 0 } = {}) => {
     const response = await axios.get<WarehousePublic[]>(`${apiBase}/api/v1/warehouses`, {
       headers: getAuthHeaders(),
-      params: { skip, limit },
+      params: { skip },
     })
     return response.data
   },

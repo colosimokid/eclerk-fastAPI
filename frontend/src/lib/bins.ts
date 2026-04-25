@@ -39,10 +39,10 @@ export type BinUpdate = {
 }
 
 export const BinsService = {
-  readBins: async ({ skip = 0, limit = 100 } = {}) => {
+  readBins: async ({ skip = 0 } = {}) => {
     const response = await axios.get<BinPublic[]>(`${apiBase}/api/v1/bins`, {
       headers: getAuthHeaders(),
-      params: { skip, limit },
+      params: { skip },
     })
     return response.data
   },
@@ -68,10 +68,10 @@ export const BinsService = {
     return response.data
   },
 
-  readBinsByWarehouse: async (warehouseId: string, { skip = 0, limit = 100 } = {}) => {
+  readBinsByWarehouse: async (warehouseId: string, { skip = 0 } = {}) => {
     const response = await axios.get<BinPublic[]>(`${apiBase}/api/v1/bins/warehouse/${warehouseId}`, {
       headers: getAuthHeaders(),
-      params: { skip, limit },
+      params: { skip },
     })
     return response.data
   },

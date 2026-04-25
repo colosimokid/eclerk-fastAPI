@@ -7,7 +7,7 @@ import HierarchyManager from "@/components/Hierarchy/HierarchyManager"
 
 function getCategoriesQueryOptions() {
   return {
-    queryFn: () => CategoriesService.readCategories({ skip: 0, limit: 100 }),
+    queryFn: () => CategoriesService.readCategories({ skip: 0 }),
     queryKey: ["categories"],
   }
 }

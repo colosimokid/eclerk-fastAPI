@@ -27,10 +27,10 @@ export type BrandUpdate = {
 }
 
 export const BrandsService = {
-  readBrands: async ({ skip = 0, limit = 100 } = {}) => {
+  readBrands: async ({ skip = 0 } = {}) => {
     const response = await axios.get<BrandPublic[]>(`${apiBase}/api/v1/brands`, {
       headers: getAuthHeaders(),
-      params: { skip, limit },
+      params: { skip },
     })
     return response.data
   },

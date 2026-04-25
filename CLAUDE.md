@@ -127,7 +127,7 @@ These rules apply at all times when working in this repository.
 - Validate data contracts against `http://localhost:8000/docs`.
 - All backend endpoints are prefixed with `/api/v1` (e.g., `/api/v1/brands`).
 - In data tables, display UUIDs as first 8 characters + "..." with a tooltip showing the full UUID.
-- In API queries, do not set a default limit — allow unlimited results.
+- In API queries, **never pass a `limit` param** — not in lib files, not in route `queryFn` calls. Backend defaults to `limit: int | None = None` (unlimited). Any hardcoded limit (100, 10000, etc.) is wrong.
 - Docker is run by the user in their terminal — do not generate or run docker commands.
 
 ---

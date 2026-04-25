@@ -10,7 +10,7 @@ import { columns } from "@/components/General/columns"
 
 function getBrandsQueryOptions() {
   return {
-    queryFn: () => BrandsService.readBrands({ skip: 0, limit: 100 }),
+    queryFn: () => BrandsService.readBrands({ skip: 0 }),
     queryKey: ["brands"],
   }
 }

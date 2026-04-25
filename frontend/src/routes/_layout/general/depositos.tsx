@@ -29,14 +29,14 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard"
 
 function getWarehousesQueryOptions() {
   return {
-    queryFn: () => WarehousesService.readWarehouses({ skip: 0, limit: 100 }),
+    queryFn: () => WarehousesService.readWarehouses({ skip: 0 }),
     queryKey: ["warehouses"],
   }
 }
 
 function getBinsQueryOptions() {
   return {
-    queryFn: () => BinsService.readBins({ skip: 0, limit: 100 }),
+    queryFn: () => BinsService.readBins({ skip: 0 }),
     queryKey: ["bins"],
   }
 }

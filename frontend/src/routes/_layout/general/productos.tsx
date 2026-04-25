@@ -10,7 +10,7 @@ import { columnsProducts } from "@/components/General/columnsProducts"
 
 function getProductsQueryOptions() {
   return {
-    queryFn: () => ProductsService.readProducts({ skip: 0, limit: 100 }),
+    queryFn: () => ProductsService.readProducts({ skip: 0 }),
     queryKey: ["products"],
   }
 }

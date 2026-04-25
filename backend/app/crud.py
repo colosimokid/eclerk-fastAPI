@@ -1,6 +1,7 @@
 import uuid
 from typing import Any
 
+from sqlalchemy.orm import selectinload
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
@@ -413,7 +414,7 @@ def search_storage_details(
     limit: int | None = None
 ) -> list[StorageDetail]:
     from app.models import Bin, Product
-    statement = select(StorageDetail)
+    statement = select(StorageDetail).options(selectinload(StorageDetail.product))
     if bin_id:
         statement = statement.where(StorageDetail.bin_id == bin_id)
     elif warehouse_id:

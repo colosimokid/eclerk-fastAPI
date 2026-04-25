@@ -12,6 +12,7 @@ from app.api.deps import (
 
 from app.models import (
     StorageDetailPublic,
+    StorageDetailSearchPublic,
 )
 from fastapi import Query
 router = APIRouter(prefix="/storage_details", tags=["storage_details"])
@@ -19,7 +20,7 @@ router = APIRouter(prefix="/storage_details", tags=["storage_details"])
 @router.get(
     "/search",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=list[StorageDetailPublic],
+    response_model=list[StorageDetailSearchPublic],
 )
 def search_storage_details(
     session: SessionDep,
@@ -32,7 +33,7 @@ def search_storage_details(
     """
     Search storage details by warehouse, bin, and product fields.
     """
-    return crud.search_storage_details(
+    storage_details = crud.search_storage_details(
         session=session,
         warehouse_id=warehouse_id,
         bin_id=bin_id,
@@ -40,6 +41,13 @@ def search_storage_details(
         skip=skip,
         limit=limit,
     )
+    result = []
+    for sd in storage_details:
+        data = sd.model_dump()
+        data["product_codigo"] = sd.product.codigo if sd.product else None
+        data["product_descripcion"] = sd.product.descripcion if sd.product else None
+        result.append(StorageDetailSearchPublic.model_validate(data))
+    return result
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.models import StorageDetailCreate, StorageDetailPublic, StorageDetailUpdate, Message
 

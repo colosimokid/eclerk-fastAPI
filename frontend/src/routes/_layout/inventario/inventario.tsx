@@ -58,7 +58,9 @@ function Field({ label, value }: { label: string; value?: string | number | null
         {label}
       </span>
       <span className="text-sm">
-        {value !== null && value !== undefined && value !== "" ? value : (
+        {value !== null && value !== undefined && value !== "" ? (
+          value
+        ) : (
           <span className="text-muted-foreground">—</span>
         )}
       </span>
@@ -67,15 +69,19 @@ function Field({ label, value }: { label: string; value?: string | number | null
 }
 
 function ProductDialog({
-  product,
+  productId,
   open,
   onClose,
 }: {
-  product: ProductPublic | null
+  productId: string | null
   open: boolean
   onClose: () => void
 }) {
-  if (!product) return null
+  const { data: product, isLoading } = useQuery<ProductPublic>({
+    queryKey: ["product", productId],
+    queryFn: () => ProductsService.getProductById(productId!),
+    enabled: productId !== null,
+  })
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -83,70 +89,80 @@ function ProductDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="h-5 w-5 text-muted-foreground" />
-            {product.codigo} — {product.descripcion}
+            {isLoading
+              ? "Cargando..."
+              : product
+                ? `${product.codigo} — ${product.descripcion}`
+                : "Producto"}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-6 pt-2">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            <Field label="Código" value={product.codigo} />
-            <Field label="Referencia" value={product.referencia} />
-            <Field label="Activo" value={product.is_active ? "Sí" : "No"} />
-          </div>
-
-          <div className="border-t pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-              Descripción
-            </p>
-            <div className="grid grid-cols-1 gap-4">
-              <Field label="Descripción" value={product.descripcion} />
-              <Field label="Descripción adicional" value={product.descripcion_adicional} />
-            </div>
-          </div>
-
-          <div className="border-t pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-              Barcodes
-            </p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Field label="Barcode 1" value={product.cod_barras_1} />
-              <Field label="Barcode 2" value={product.cod_barras_2} />
-              <Field label="Barcode 3" value={product.cod_barras_3} />
-            </div>
-          </div>
-
-          <div className="border-t pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-              Precios e impuestos
-            </p>
+        {isLoading ? (
+          <div className="py-8 text-center text-muted-foreground">Cargando datos del producto...</div>
+        ) : !product ? (
+          <div className="py-8 text-center text-muted-foreground">No se pudo cargar el producto.</div>
+        ) : (
+          <div className="flex flex-col gap-6 pt-2">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <Field label="Último costo" value={product.ultimo_coste ?? undefined} />
-              <Field label="Impuesto compra %" value={product.impuesto_compra} />
-              <Field label="Impuesto venta %" value={product.impuesto_venta} />
+              <Field label="Código" value={product.codigo} />
+              <Field label="Referencia" value={product.referencia} />
+              <Field label="Activo" value={product.is_active ? "Sí" : "No"} />
             </div>
-          </div>
 
-          <div className="border-t pt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-              Otros
-            </p>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <Field label="Peso" value={product.peso ?? undefined} />
-              <div className="flex flex-col gap-0.5">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  ID
-                </span>
-                <ShortId id={product.id} />
+            <div className="border-t pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                Descripción
+              </p>
+              <div className="grid grid-cols-1 gap-4">
+                <Field label="Descripción" value={product.descripcion} />
+                <Field label="Descripción adicional" value={product.descripcion_adicional} />
               </div>
-              {product.created_at && (
-                <Field
-                  label="Creado"
-                  value={new Date(product.created_at).toLocaleDateString("es-VE")}
-                />
-              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                Barcodes
+              </p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <Field label="Barcode 1" value={product.cod_barras_1} />
+                <Field label="Barcode 2" value={product.cod_barras_2} />
+                <Field label="Barcode 3" value={product.cod_barras_3} />
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                Precios e impuestos
+              </p>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <Field label="Último costo" value={product.ultimo_coste ?? undefined} />
+                <Field label="Impuesto compra %" value={product.impuesto_compra} />
+                <Field label="Impuesto venta %" value={product.impuesto_venta} />
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                Otros
+              </p>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <Field label="Peso" value={product.peso ?? undefined} />
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    ID
+                  </span>
+                  <ShortId id={product.id} />
+                </div>
+                {product.created_at && (
+                  <Field
+                    label="Creado"
+                    value={new Date(product.created_at).toLocaleDateString("es-VE")}
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   )
@@ -163,7 +179,7 @@ function InventarioContent() {
   const [binId, setBinId] = useState<string>(ALL)
   const [productQuery, setProductQuery] = useState<string>("")
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilters | null>(null)
-  const [selectedProduct, setSelectedProduct] = useState<ProductPublic | null>(null)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
 
   const { data: warehouses = [] } = useQuery<WarehousePublic[]>({
     queryKey: ["warehouses"],
@@ -175,13 +191,9 @@ function InventarioContent() {
     queryFn: () => BinsService.readBins(),
   })
 
-  const { data: allProducts = [] } = useQuery<ProductPublic[]>({
-    queryKey: ["products"],
-    queryFn: () => ProductsService.readProducts(),
-  })
-
   const filteredBins = useMemo(
-    () => (warehouseId === ALL ? allBins : allBins.filter((b) => b.warehouse_id === warehouseId)),
+    () =>
+      warehouseId === ALL ? allBins : allBins.filter((b) => b.warehouse_id === warehouseId),
     [allBins, warehouseId],
   )
 
@@ -204,10 +216,6 @@ function InventarioContent() {
     () => Object.fromEntries(warehouses.map((w) => [w.id, w])),
     [warehouses],
   )
-  const productMap = useMemo(
-    () => Object.fromEntries(allProducts.map((p) => [p.id, p])),
-    [allProducts],
-  )
 
   const columns = useMemo<ColumnDef<StorageDetailPublic>[]>(
     () => [
@@ -215,19 +223,21 @@ function InventarioContent() {
         accessorKey: "product_id",
         header: "Producto",
         cell: ({ row }) => {
-          const product = productMap[row.original.product_id]
-          if (!product) return <ShortId id={row.original.product_id} />
+          const { product_codigo, product_descripcion, product_id } = row.original
+          if (!product_codigo && !product_descripcion) {
+            return <ShortId id={product_id} />
+          }
           return (
             <button
               type="button"
               className="text-left group"
-              onClick={() => setSelectedProduct(product)}
+              onClick={() => setSelectedProductId(product_id)}
             >
               <span className="text-xs font-mono text-muted-foreground group-hover:text-foreground transition-colors">
-                {product.codigo}
+                {product_codigo}
               </span>
               <p className="font-medium text-sm leading-tight group-hover:underline underline-offset-2">
-                {product.descripcion}
+                {product_descripcion}
               </p>
             </button>
           )
@@ -298,7 +308,7 @@ function InventarioContent() {
         ),
       },
     ],
-    [binMap, warehouseMap, productMap],
+    [binMap, warehouseMap],
   )
 
   const handleWarehouseChange = (value: string) => {
@@ -401,9 +411,9 @@ function InventarioContent() {
       )}
 
       <ProductDialog
-        product={selectedProduct}
-        open={selectedProduct !== null}
-        onClose={() => setSelectedProduct(null)}
+        productId={selectedProductId}
+        open={selectedProductId !== null}
+        onClose={() => setSelectedProductId(null)}
       />
     </div>
   )

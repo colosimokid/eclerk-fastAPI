@@ -519,6 +519,11 @@ class StorageDetailPublic(StorageDetailBase):
     updated_at: datetime | None = None
 
 
+class StorageDetailSearchPublic(StorageDetailPublic):
+    product_codigo: str | None = None
+    product_descripcion: str | None = None
+
+
 class StorageDetailsPublic(SQLModel):
     data: list[StorageDetailPublic]
     count: int

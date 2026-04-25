@@ -18,6 +18,8 @@ export type StorageDetailPublic = {
   is_active: boolean
   created_at?: string | null
   updated_at?: string | null
+  product_codigo?: string | null
+  product_descripcion?: string | null
 }
 
 export type StorageDetailSearchParams = {

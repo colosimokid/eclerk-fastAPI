@@ -1,14 +1,21 @@
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import type { ColumnDef } from "@tanstack/react-table"
-import { Search } from "lucide-react"
+import { Package, Search } from "lucide-react"
 import { useMemo, useState } from "react"
 
 import { BinsService, type BinPublic } from "@/lib/bins"
+import { ProductsService, type ProductPublic } from "@/lib/products"
 import { StorageDetailsService, type StorageDetailPublic } from "@/lib/storage_details"
 import { WarehousesService, type WarehousePublic } from "@/lib/warehouses"
 import { DataTable } from "@/components/Common/DataTable"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -44,6 +51,107 @@ function ShortId({ id }: { id: string }) {
   )
 }
 
+function Field({ label, value }: { label: string; value?: string | number | null }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        {label}
+      </span>
+      <span className="text-sm">
+        {value !== null && value !== undefined && value !== "" ? value : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </span>
+    </div>
+  )
+}
+
+function ProductDialog({
+  product,
+  open,
+  onClose,
+}: {
+  product: ProductPublic | null
+  open: boolean
+  onClose: () => void
+}) {
+  if (!product) return null
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-muted-foreground" />
+            {product.codigo} — {product.descripcion}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-6 pt-2">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <Field label="Código" value={product.codigo} />
+            <Field label="Referencia" value={product.referencia} />
+            <Field label="Activo" value={product.is_active ? "Sí" : "No"} />
+          </div>
+
+          <div className="border-t pt-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              Descripción
+            </p>
+            <div className="grid grid-cols-1 gap-4">
+              <Field label="Descripción" value={product.descripcion} />
+              <Field label="Descripción adicional" value={product.descripcion_adicional} />
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              Barcodes
+            </p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <Field label="Barcode 1" value={product.cod_barras_1} />
+              <Field label="Barcode 2" value={product.cod_barras_2} />
+              <Field label="Barcode 3" value={product.cod_barras_3} />
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              Precios e impuestos
+            </p>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <Field label="Último costo" value={product.ultimo_coste ?? undefined} />
+              <Field label="Impuesto compra %" value={product.impuesto_compra} />
+              <Field label="Impuesto venta %" value={product.impuesto_venta} />
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+              Otros
+            </p>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <Field label="Peso" value={product.peso ?? undefined} />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  ID
+                </span>
+                <ShortId id={product.id} />
+              </div>
+              {product.created_at && (
+                <Field
+                  label="Creado"
+                  value={new Date(product.created_at).toLocaleDateString("es-VE")}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 type AppliedFilters = {
   warehouseId: string
   binId: string
@@ -55,6 +163,7 @@ function InventarioContent() {
   const [binId, setBinId] = useState<string>(ALL)
   const [productQuery, setProductQuery] = useState<string>("")
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilters | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<ProductPublic | null>(null)
 
   const { data: warehouses = [] } = useQuery<WarehousePublic[]>({
     queryKey: ["warehouses"],
@@ -64,6 +173,11 @@ function InventarioContent() {
   const { data: allBins = [] } = useQuery<BinPublic[]>({
     queryKey: ["bins"],
     queryFn: () => BinsService.readBins(),
+  })
+
+  const { data: allProducts = [] } = useQuery<ProductPublic[]>({
+    queryKey: ["products"],
+    queryFn: () => ProductsService.readProducts(),
   })
 
   const filteredBins = useMemo(
@@ -90,13 +204,34 @@ function InventarioContent() {
     () => Object.fromEntries(warehouses.map((w) => [w.id, w])),
     [warehouses],
   )
+  const productMap = useMemo(
+    () => Object.fromEntries(allProducts.map((p) => [p.id, p])),
+    [allProducts],
+  )
 
   const columns = useMemo<ColumnDef<StorageDetailPublic>[]>(
     () => [
       {
         accessorKey: "product_id",
         header: "Producto",
-        cell: ({ getValue }) => <ShortId id={getValue<string>()} />,
+        cell: ({ row }) => {
+          const product = productMap[row.original.product_id]
+          if (!product) return <ShortId id={row.original.product_id} />
+          return (
+            <button
+              type="button"
+              className="text-left group"
+              onClick={() => setSelectedProduct(product)}
+            >
+              <span className="text-xs font-mono text-muted-foreground group-hover:text-foreground transition-colors">
+                {product.codigo}
+              </span>
+              <p className="font-medium text-sm leading-tight group-hover:underline underline-offset-2">
+                {product.descripcion}
+              </p>
+            </button>
+          )
+        },
       },
       {
         id: "bin",
@@ -163,7 +298,7 @@ function InventarioContent() {
         ),
       },
     ],
-    [binMap, warehouseMap],
+    [binMap, warehouseMap, productMap],
   )
 
   const handleWarehouseChange = (value: string) => {
@@ -264,6 +399,12 @@ function InventarioContent() {
       ) : (
         <DataTable columns={columns} data={results} />
       )}
+
+      <ProductDialog
+        product={selectedProduct}
+        open={selectedProduct !== null}
+        onClose={() => setSelectedProduct(null)}
+      />
     </div>
   )
 }
